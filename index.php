@@ -1,39 +1,21 @@
 <?php
-    include_once("Database.php");
-    include_once("Actor.php");
+    include_once("./models/Database.php");
+    include_once("./models/Actor.php");
+    include_once("./controllers/ActorController.php");
 
     $actors = array();
 
     $db = new Database();
 
 
-
     if(isset($_POST['Submit'])){
-        $actor = new Actor($_POST['id'], $_POST['name'], $_POST['surname'], $_POST['age']);
-        $id = $db->Insert(
-            "INSERT INTO actors (name, surname, age) VALUES (?, ?, ?)", 
-            ["sss",$actor->name, $actor->surname, $actor->age]
-        );
-        echo "New record created successfully. Last inserted ID is: " . $id;
+        ActorController::add();
     }
     if(isset($_REQUEST['remove'])) {
-        $unique_id = $_POST['index'];
-        if($unique_id!==false) {
-            $db->Remove(
-                "DELETE FROM actors WHERE id = ?",
-                ["i", $unique_id]
-            );
-        }
+        ActorController::remove();
     }
     if(isset($_POST['update'])) {
-        $unique_id = $_POST["index"];
-        if($unique_id!==false) {
-            $actor = new Actor($_POST['index'], $_POST['name'], $_POST['surname'], $_POST['age']);
-            $db->Update(
-                "UPDATE actors SET name = ?, surname = ?, age = ? WHERE id = ?",
-                ["sssi", $actor->name, $actor->surname, $actor->age, $actor->id]
-            );
-        }
+        ActorController::update();
     }
 ?>
 <!DOCTYPE html>
@@ -64,11 +46,7 @@
         </thead>
         <tbody> 
             <?php 
-                $dbResult = $db->Select("SELECT * FROM actors");
-                foreach($dbResult as $row) {
-                    $actors[] = new Actor($row["id"], $row["name"], $row["surname"], $row["age"]);
-                }
-
+                $actors = ActorController::get();
                 foreach($actors as $actor) {
             ?>
             <tr>
